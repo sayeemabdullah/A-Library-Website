@@ -80,6 +80,8 @@ def create_user():
         
     users = User.query.all()
 
+    data['name'] = data['name'].upper()
+
     for user in users:
         if data['name'] == user.name:
             return jsonify({'message' : 'User already exist'})           
