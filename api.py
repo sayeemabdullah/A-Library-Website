@@ -52,6 +52,7 @@ def get_all_users():
 
     return jsonify({'users' : output})
 
+
 @app.route('/user/<public_id>', methods=['GET'])
 def get_one_user(public_id):
 
@@ -76,12 +77,21 @@ def create_user():
     data = request.get_json()
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
+        
+    users = User.query.all()
+
+    for user in users:
+        if data['name'] == user.name:
+            return jsonify({'message' : 'User already exist'})           
+
 
     new_user = User(public_id=str(uuid.uuid4()), name=data['name'], password=hashed_password, admin=False)
+
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({'message' : 'New user has been created'})
+
 
 @app.route('/user/<public_id>', methods=['PUT'])
 def promote_user(public_id):
@@ -94,6 +104,7 @@ def promote_user(public_id):
         user.admin = True
         db.session.commit()
         return jsonify({'message' : 'User updated to Admin'})
+
 
 @app.route('/user/<public_id>',methods=['DELETE'])
 def delete_user(public_id):
