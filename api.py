@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy 
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+import datetime
 # import os
 
 # python api.py
@@ -84,7 +86,7 @@ def create_user():
 
     for user in users:
         if data['name'] == user.name:
-            return jsonify({'message' : 'User already exist'})           
+            return jsonify({'message' : 'Username already exist'})           
 
 
     new_user = User(public_id=str(uuid.uuid4()), name=data['name'], password=hashed_password, admin=False)
@@ -105,7 +107,7 @@ def promote_user(public_id):
     else:
         user.admin = True
         db.session.commit()
-        return jsonify({'message' : 'User updated to Admin'})
+        return jsonify({'message' : 'User upgraded to Admin'})
 
 
 @app.route('/user/<public_id>',methods=['DELETE'])
@@ -119,6 +121,26 @@ def delete_user(public_id):
         db.session.delete(user)
         db.session.commit()
         return jsonify({'message' : 'User deleted'})
+
+@app.route('/login')
+def login():
+    auth = request.authorization
+
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+    user = User.query.filter_by(name=auth.username.upper()).first()
+
+    if not user:
+        return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    
+    if check_password_hash(user.password, auth.password):
+        token = jwt.encode({'public id' : user.public_id}, app.config['SECRET_KEY'])
+
+        return jsonify({'token' : token.decode('UTF-8')})
+    
+    return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
 
 
 if __name__ == '__main__':
