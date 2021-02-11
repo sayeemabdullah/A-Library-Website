@@ -5,7 +5,7 @@
 ### I used Python (Flask) to create RESTFul API and used Flask-SQLAlchemy [SQLite] for the database.
 ### For the token authentication I used JSON Web Token Authentication 1.7.1*
 
-First, To create the database we have to run the following commands in the command prompt :
+To create the database we have to run the following commands in the command prompt :
 
 ```console
 A-Library-Website >python
@@ -13,7 +13,9 @@ A-Library-Website >python
 >>db.create_all()
 >>exit()
 ```
-#### N.B. IF YOU DON'T HAVE SQLITE OR SQLAlchemy INSTALLED PLEASE DO THAT FIRST
+Or you can use the existing database which is **recommended**.
+
+#### N.B. IF YOU DON'T HAVE SQLITE OR/AND SQLAlchemy INSTALLED PLEASE DO THAT FIRST
 
 Once it is done and the database is created with the required tables you can use the following command to start the file :
 
