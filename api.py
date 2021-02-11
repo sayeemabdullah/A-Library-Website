@@ -29,13 +29,18 @@ class User(db.Model):
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    book_public_id = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50))
     author = db.Column(db.String(50))
     publication_year = db.Column(db.Integer)
 
 class Wishlist(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    wishlist_public_id = db.Column(db.String(50), unique=True)
+    user_public_id = db.Column(db.Integer)
+    book_public_id = db.Column(db.Integer)
+
+
 
 #TOKEN -- STARTS --
 
@@ -67,7 +72,7 @@ def token_required(f):
 #USER -- STARTS --   
 
 @app.route('/user', methods=['GET'])
-@token_required
+@token_required 
 def get_all_users(current_user):
 
     if not current_user.admin:
@@ -111,8 +116,7 @@ def get_one_user(current_user, public_id):
 
 
 @app.route('/user', methods=['POST'])
-@token_required
-def create_user(current_user):
+def create_user():
 
     data = request.get_json()
 
@@ -136,7 +140,7 @@ def create_user(current_user):
 
 
 @app.route('/user/<public_id>', methods=['PUT'])
-@token_required
+@token_required 
 def promote_user(current_user, public_id):
 
     if not current_user.admin:
@@ -194,7 +198,7 @@ def view_all_books(current_user):
     else:
         for book in books:
             book_data = {}
-            book_data['id']  = book.id
+            book_data['book_public_id']  = book.book_public_id
             book_data['name']  = book.name
             book_data['author'] = book.author
             book_data['publication_year'] = book.publication_year
@@ -221,12 +225,29 @@ def add_book(current_user):
             return jsonify({'message' : 'Book is already in the library'})           
 
 
-    new_book = Book(name=data['name'], author=data['author'], publication_year=data['publication_year'])
+    new_book = Book(book_public_id=str(uuid.uuid4()),name=data['name'], author=data['author'], publication_year=data['publication_year'])
 
     db.session.add(new_book)
     db.session.commit()
 
     return jsonify({'message' : 'New book has been added'})
+
+
+@app.route('/book/<book_public_id>',methods=['DELETE'])
+@token_required
+def delete_book(current_user, book_public_id):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
+
+    book = Book.query.filter_by(book_public_id=book_public_id).first()
+
+    if not book:
+        return jsonify({'message' : 'Book not found'})
+    else:
+        db.session.delete(book)
+        db.session.commit()
+        return jsonify({'message' : 'Book deleted'})
 
 #BOOK -- ENDS --
 
@@ -246,7 +267,7 @@ def login():
         return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token.decode('UTF-8')})
     
