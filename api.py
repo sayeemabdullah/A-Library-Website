@@ -173,6 +173,25 @@ def delete_user(current_user, public_id):
 
 #BOOK -- STARTS --
 
+@app.route('/book', methods=['GET'])
+@token_required
+def view_all_books(current_user):
+
+
+    books = Book.query.all()
+
+    output = []
+
+    for book in books:
+        book_data = {}
+        book_data['name']  = book.name
+        book_data['author'] = book.author
+        book_data['publication_year'] = book.publication_year
+        output.append(book_data)
+
+    return jsonify({'books' : output})
+
+
 #BOOK -- ENDS --
 
 
