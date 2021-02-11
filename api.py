@@ -4,6 +4,7 @@ import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
+from functools import wraps
 # import os
 
 # python api.py
@@ -36,9 +37,41 @@ class Wishlist(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer)
 
+#TOKEN -- STARTS --
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message' : 'Token not found!'}), 401
+        
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            # return jsonify({'message' : data}), 401
+            current_user = User.query.filter_by(public_id = data['public_id']).first()
+        except:
+            return jsonify({'message' : 'Token is invalid'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+#TOKEN -- ENDS --
+
+#USER -- STARTS --   
 
 @app.route('/user', methods=['GET'])
-def get_all_users():
+@token_required
+def get_all_users(current_user):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
 
     users = User.query.all()
 
@@ -56,7 +89,11 @@ def get_all_users():
 
 
 @app.route('/user/<public_id>', methods=['GET'])
-def get_one_user(public_id):
+@token_required
+def get_one_user(current_user, public_id):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -74,7 +111,8 @@ def get_one_user(public_id):
 
 
 @app.route('/user', methods=['POST'])
-def create_user():
+@token_required
+def create_user(current_user):
 
     data = request.get_json()
 
@@ -98,7 +136,11 @@ def create_user():
 
 
 @app.route('/user/<public_id>', methods=['PUT'])
-def promote_user(public_id):
+@token_required
+def promote_user(current_user, public_id):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -111,7 +153,11 @@ def promote_user(public_id):
 
 
 @app.route('/user/<public_id>',methods=['DELETE'])
-def delete_user(public_id):
+@token_required
+def delete_user(current_user, public_id):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -121,6 +167,16 @@ def delete_user(public_id):
         db.session.delete(user)
         db.session.commit()
         return jsonify({'message' : 'User deleted'})
+
+
+#USER -- ENDS -- 
+
+#BOOK -- STARTS --
+
+#BOOK -- ENDS --
+
+
+# LOGIN -- STARTS --
 
 @app.route('/login')
 def login():
@@ -135,13 +191,13 @@ def login():
         return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public id' : user.public_id}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token.decode('UTF-8')})
     
     return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
-
+# LOGIN -- ENDS --
 
 if __name__ == '__main__':
     app.run(debug=True)
