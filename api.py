@@ -42,7 +42,7 @@ class Wishlist(db.Model):
 
 
 
-#TOKEN -- STARTS --
+# TOKEN -- STARTS --
 
 def token_required(f):
     @wraps(f)
@@ -67,9 +67,9 @@ def token_required(f):
 
     return decorated
 
-#TOKEN -- ENDS --
+# TOKEN -- ENDS --
 
-#USER -- STARTS --   
+# USER -- STARTS --   
 
 @app.route('/user', methods=['GET'])
 @token_required 
@@ -173,9 +173,9 @@ def delete_user(current_user, public_id):
         return jsonify({'message' : 'User deleted'})
 
 
-#USER -- ENDS -- 
+# USER -- ENDS -- 
 
-#BOOK -- STARTS --
+# BOOK -- STARTS --
 
 @app.route('/book', methods=['GET'])
 @token_required
@@ -186,17 +186,7 @@ def view_all_books(current_user):
 
     output = []
 
-    if not current_user.admin:
-        for book in books:
-            book_data = {}
-            book_data['name']  = book.name
-            book_data['author'] = book.author
-            book_data['publication_year'] = book.publication_year
-            output.append(book_data)
-
-        return jsonify({'books' : output})
-    else:
-        for book in books:
+    for book in books:
             book_data = {}
             book_data['book_public_id']  = book.book_public_id
             book_data['name']  = book.name
@@ -204,7 +194,27 @@ def view_all_books(current_user):
             book_data['publication_year'] = book.publication_year
             output.append(book_data)
 
-        return jsonify({'books' : output})
+    return jsonify({'books' : output})
+
+
+@app.route('/book/<book_public_id>', methods=['GET'])
+@token_required
+def view_one_book(current_user, book_public_id):
+
+
+    book = Book.query.filter_by(book_public_id=book_public_id).first()
+
+    output = []
+
+    book_data = {}
+    book_data['book_public_id']  = book.book_public_id
+    book_data['name']  = book.name
+    book_data['author'] = book.author
+    book_data['publication_year'] = book.publication_year
+    output.append(book_data)
+            
+
+    return jsonify({'books' : output})
 
 
 @app.route('/book', methods=['POST'])
@@ -270,8 +280,13 @@ def update_book(current_user, book_public_id):
         db.session.commit()
         return jsonify({'message' : 'Book updated'})
 
-#BOOK -- ENDS --
+# BOOK -- ENDS --
 
+# WISHLIST -- STARTS --
+
+
+
+# WISHLIST -- ENDS --
 
 # LOGIN -- STARTS --
 
