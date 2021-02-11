@@ -182,14 +182,25 @@ def view_all_books(current_user):
 
     output = []
 
-    for book in books:
-        book_data = {}
-        book_data['name']  = book.name
-        book_data['author'] = book.author
-        book_data['publication_year'] = book.publication_year
-        output.append(book_data)
+    if not current_user.admin:
+        for book in books:
+            book_data = {}
+            book_data['name']  = book.name
+            book_data['author'] = book.author
+            book_data['publication_year'] = book.publication_year
+            output.append(book_data)
 
-    return jsonify({'books' : output})
+        return jsonify({'books' : output})
+    else:
+        for book in books:
+            book_data = {}
+            book_data['id']  = book.id
+            book_data['name']  = book.name
+            book_data['author'] = book.author
+            book_data['publication_year'] = book.publication_year
+            output.append(book_data)
+
+        return jsonify({'books' : output})
 
 
 @app.route('/book', methods=['POST'])
