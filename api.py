@@ -192,6 +192,31 @@ def view_all_books(current_user):
     return jsonify({'books' : output})
 
 
+@app.route('/book', methods=['POST'])
+@token_required
+def add_book(current_user):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
+    
+    data = request.get_json()
+       
+    books = Book.query.all()
+
+    data['name'] = data['name'].upper()
+
+    for book in books:
+        if data['name'] == book.name:
+            return jsonify({'message' : 'Book is already in the library'})           
+
+
+    new_book = Book(name=data['name'], author=data['author'], publication_year=data['publication_year'])
+
+    db.session.add(new_book)
+    db.session.commit()
+
+    return jsonify({'message' : 'New book has been added'})
+
 #BOOK -- ENDS --
 
 
