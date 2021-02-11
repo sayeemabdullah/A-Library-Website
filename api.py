@@ -249,6 +249,27 @@ def delete_book(current_user, book_public_id):
         db.session.commit()
         return jsonify({'message' : 'Book deleted'})
 
+
+@app.route('/book/<book_public_id>', methods=['PUT'])
+@token_required 
+def update_book(current_user, book_public_id):
+
+    if not current_user.admin:
+        return jsonify({'message' : 'You are not authorized.'})
+
+    book = Book.query.filter_by(book_public_id=book_public_id).first()
+
+    data = request.get_json()
+
+    if not book:
+        return jsonify({'message' : 'Book not found'})
+    else:
+        book.name = data['name']
+        book.author = data['author']
+        book.publication_year = data['publication_year'] 
+        db.session.commit()
+        return jsonify({'message' : 'Book updated'})
+
 #BOOK -- ENDS --
 
 
