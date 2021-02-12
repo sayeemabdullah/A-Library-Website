@@ -307,7 +307,7 @@ def view_all_wishlists(current_user):
 
     for wishlist in wishlists:
             wishlists_data = {}
-            # wishlists_data['wishlist_public_id']  = wishlist.wishlist_public_id
+            wishlists_data['wishlist_public_id']  = wishlist.wishlist_public_id
             # wishlists_data['user_public_id']  = wishlist.user_public_id
             wishlists_data['book_public_id'] = wishlist.book_public_id
             books = Book.query.filter_by(book_public_id=wishlist.book_public_id)
@@ -321,6 +321,20 @@ def view_all_wishlists(current_user):
             output.append(wishlists_data)
 
     return jsonify({'wishlists' : output})
+
+@app.route('/wishlist/<wishlist_public_id>',methods=['DELETE'])
+@token_required
+def delete_book_from_wishlist(current_user, wishlist_public_id):
+
+    wishlist = Wishlist.query.filter_by(wishlist_public_id=wishlist_public_id).first()
+
+    if not wishlist:
+        return jsonify({'message' : 'Wishlist not found'})
+    else:
+        db.session.delete(wishlist)
+        db.session.commit()
+        return jsonify({'message' : 'Wishlist deleted'})
+
 
 # WISHLIST -- ENDS --
 
