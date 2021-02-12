@@ -284,7 +284,43 @@ def update_book(current_user, book_public_id):
 
 # WISHLIST -- STARTS --
 
+@app.route('/wishlist/<book_public_id>', methods=['POST'])
+@token_required
+def add_wishlist(current_user, book_public_id):
+    
+    new_wishlist = Wishlist(wishlist_public_id=str(uuid.uuid4()),user_public_id=current_user.public_id, book_public_id=book_public_id)
+    db.session.add(new_wishlist)
+    db.session.commit()
 
+    return jsonify({'message' : 'New wishlist has been added'})
+
+
+@app.route('/wishlist', methods=['GET'])
+@token_required
+def view_all_wishlists(current_user):
+
+
+    wishlists = Wishlist.query.filter_by(user_public_id=current_user.public_id)
+    
+
+    output = []
+
+    for wishlist in wishlists:
+            wishlists_data = {}
+            # wishlists_data['wishlist_public_id']  = wishlist.wishlist_public_id
+            # wishlists_data['user_public_id']  = wishlist.user_public_id
+            wishlists_data['book_public_id'] = wishlist.book_public_id
+            books = Book.query.filter_by(book_public_id=wishlist.book_public_id)
+            for book in books:
+                if wishlist.book_public_id == book.book_public_id:
+                    # wishlists_data['book_public_id']  = book.book_public_id
+                    wishlists_data['name']  = book.name
+                    wishlists_data['author'] = book.author
+                    wishlists_data['publication_year'] = book.publication_year
+
+            output.append(wishlists_data)
+
+    return jsonify({'wishlists' : output})
 
 # WISHLIST -- ENDS --
 
