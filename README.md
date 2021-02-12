@@ -28,7 +28,7 @@ A-Library-Website >python api.py
 
 There are two types of users one is general user and another is admin user. 
 
-The general user can - 
+The **general user** can - 
 
 * login
 * view books
@@ -38,7 +38,7 @@ The general user can -
 * add books in wishlist
 * delete books from wishlist
 
-The admin user can -
+The **admin user** can -
 
 * login
 * add admin
@@ -57,7 +57,7 @@ The admin user can -
 
 ### Security:
 
-I have used werkzeug to ensure secure password and JSON Web Token Authentication to generate token which can be used to access a protected resource.
+I have used **Werkzeug** to ensure secure password and **JSON Web Token Authentication** to generate token which can be used to access a protected resource.
 
 
 ##### * Recent versions have some bugs which may arise while decoding or encoding.  
