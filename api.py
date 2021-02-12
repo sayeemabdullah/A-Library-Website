@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, make_response
-from flask_sqlalchemy import SQLAlchemy 
+from flask_sqlalchemy import SQLAlchemy
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -281,6 +281,39 @@ def update_book(current_user, book_public_id):
         return jsonify({'message' : 'Book updated'})
 
 # BOOK -- ENDS --
+
+# SEARCH -- STARTS --
+
+@app.route('/book/search',methods=['GET'])
+@token_required 
+def search_book(current_user):
+
+    data = request.get_json()
+
+    data['name'] = data['name'].upper()
+
+      
+    book = Book.query.filter_by(name=data['name']).first()
+    # output = Book.query.filter(Book.name.contains(data['name'])).all()
+    # book = Book.query.filter_by(Book.name.like('%'+data['name']+'%'))
+
+    if not book:
+        return jsonify({'message' : 'No match found'})
+
+    output = []
+
+    book_data = {}
+    book_data['book_public_id']  = book.book_public_id
+    book_data['name']  = book.name
+    book_data['author'] = book.author
+    book_data['publication_year'] = book.publication_year
+    output.append(book_data)
+            
+
+    return jsonify({'books' : output})
+
+
+# SEARCH -- ENDS --
 
 # WISHLIST -- STARTS --
 
