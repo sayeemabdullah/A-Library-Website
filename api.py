@@ -71,7 +71,7 @@ def token_required(f):
 
 # USER -- STARTS --   
 
-@app.route('/user', methods=['GET'])
+@app.route('/api/user', methods=['GET'])
 @token_required 
 def get_all_users(current_user):
 
@@ -93,7 +93,7 @@ def get_all_users(current_user):
     return jsonify({'users' : output})
 
 
-@app.route('/user/<public_id>', methods=['GET'])
+@app.route('/api/user/<public_id>', methods=['GET'])
 @token_required
 def get_one_user(current_user, public_id):
 
@@ -115,7 +115,7 @@ def get_one_user(current_user, public_id):
         return jsonify({'users' : output})
 
 
-@app.route('/user', methods=['POST'])
+@app.route('/api/user', methods=['POST'])
 def create_user():
 
     data = request.get_json()
@@ -139,7 +139,7 @@ def create_user():
     return jsonify({'message' : 'New user has been created'})
 
 
-@app.route('/user/<public_id>', methods=['PUT'])
+@app.route('/api/user/<public_id>', methods=['PUT'])
 @token_required 
 def promote_user(current_user, public_id):
 
@@ -156,7 +156,7 @@ def promote_user(current_user, public_id):
         return jsonify({'message' : 'User upgraded to Admin'})
 
 
-@app.route('/user/<public_id>',methods=['DELETE'])
+@app.route('/api/user/<public_id>',methods=['DELETE'])
 @token_required
 def delete_user(current_user, public_id):
 
@@ -177,7 +177,7 @@ def delete_user(current_user, public_id):
 
 # BOOK -- STARTS --
 
-@app.route('/book', methods=['GET'])
+@app.route('/api/book', methods=['GET'])
 @token_required
 def view_all_books(current_user):
 
@@ -197,7 +197,7 @@ def view_all_books(current_user):
     return jsonify({'books' : output})
 
 
-@app.route('/book/<book_public_id>', methods=['GET'])
+@app.route('/api/book/<book_public_id>', methods=['GET'])
 @token_required
 def view_one_book(current_user, book_public_id):
 
@@ -217,7 +217,7 @@ def view_one_book(current_user, book_public_id):
     return jsonify({'books' : output})
 
 
-@app.route('/book', methods=['POST'])
+@app.route('/api/book', methods=['POST'])
 @token_required
 def add_book(current_user):
 
@@ -243,7 +243,7 @@ def add_book(current_user):
     return jsonify({'message' : 'New book has been added'})
 
 
-@app.route('/book/<book_public_id>',methods=['DELETE'])
+@app.route('/api/book/<book_public_id>',methods=['DELETE'])
 @token_required
 def delete_book(current_user, book_public_id):
 
@@ -260,7 +260,7 @@ def delete_book(current_user, book_public_id):
         return jsonify({'message' : 'Book deleted'})
 
 
-@app.route('/book/<book_public_id>', methods=['PUT'])
+@app.route('/api/book/<book_public_id>', methods=['PUT'])
 @token_required 
 def update_book(current_user, book_public_id):
 
@@ -284,7 +284,7 @@ def update_book(current_user, book_public_id):
 
 # SEARCH -- STARTS --
 
-@app.route('/book/search',methods=['GET'])
+@app.route('/api/book/search',methods=['GET'])
 @token_required 
 def search_book(current_user):
 
@@ -317,7 +317,7 @@ def search_book(current_user):
 
 # WISHLIST -- STARTS --
 
-@app.route('/wishlist/<book_public_id>', methods=['POST'])
+@app.route('/api/wishlist/<book_public_id>', methods=['POST'])
 @token_required
 def add_wishlist(current_user, book_public_id):
     
@@ -328,7 +328,7 @@ def add_wishlist(current_user, book_public_id):
     return jsonify({'message' : 'New wishlist has been added'})
 
 
-@app.route('/wishlist', methods=['GET'])
+@app.route('/api/wishlist', methods=['GET'])
 @token_required
 def view_all_wishlists(current_user):
 
@@ -355,7 +355,7 @@ def view_all_wishlists(current_user):
 
     return jsonify({'wishlists' : output})
 
-@app.route('/wishlist/<wishlist_public_id>',methods=['DELETE'])
+@app.route('/api/wishlist/<wishlist_public_id>',methods=['DELETE'])
 @token_required
 def delete_book_from_wishlist(current_user, wishlist_public_id):
 
@@ -373,7 +373,7 @@ def delete_book_from_wishlist(current_user, wishlist_public_id):
 
 # LOGIN -- STARTS --
 
-@app.route('/login')
+@app.route('/api/login')
 def login():
     auth = request.authorization
 
