@@ -5,12 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
+from flask_cors import CORS, cross_origin
 # import os
 
 # python api.py
 # sqlite3 alw.db
 
 app = Flask(__name__)
+CORS(app)
 
 # file_path = os.path.abspath(os.getcwd())+"\alw.db"
 
