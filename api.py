@@ -80,7 +80,9 @@ def get_all_users(current_user):
     if not current_user.admin:
         return jsonify({'message' : 'You are not authorized.'})
 
-    users = User.query.all()
+    users = User.query.all() 
+    
+    # change
 
     output = []
 
@@ -125,6 +127,8 @@ def create_user():
     hashed_password = generate_password_hash(data['password'], method='sha256')
         
     users = User.query.all()
+
+    #change
 
     data['name'] = data['name'].upper()
 
@@ -375,11 +379,14 @@ def delete_book_from_wishlist(current_user, wishlist_public_id):
 
 # LOGIN -- STARTS --
 
-@app.route('/api/login')
+@app.route('/api/login' , methods=['POST'])
 def login():
     auth = request.authorization
 
+    print("N" , request.get_json().get("name"))
+    print("P" , request.get_json().get("password"))
     if not auth or not auth.username or not auth.password:
+        print("Auth2" , auth)
         return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
     user = User.query.filter_by(name=auth.username.upper()).first()
