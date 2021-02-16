@@ -381,20 +381,23 @@ def delete_book_from_wishlist(current_user, wishlist_public_id):
 
 @app.route('/api/login' , methods=['POST'])
 def login():
-    auth = request.authorization
+    # auth = request.authorization
+    data = request.get_json()
+    # print("N" , request.get_json().get("name"))
+    # print("P" , request.get_json().get("password"))
+    # if not auth or not auth.username or not auth.password:
+    #     print("Auth2" , auth)
+    #     return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
-    print("N" , request.get_json().get("name"))
-    print("P" , request.get_json().get("password"))
-    if not auth or not auth.username or not auth.password:
-        print("Auth2" , auth)
-        return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    # user = User.query.filter_by(name=auth.username.upper()).first()
 
-    user = User.query.filter_by(name=auth.username.upper()).first()
+    data['name'] = data['name'].upper()
+    user = User.query.filter_by(name=data['name']).first()
 
     if not user:
         return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm="Login required!"'})
     
-    if check_password_hash(user.password, auth.password):
+    if check_password_hash(user.password, data['password']):
         token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token.decode('UTF-8')})
