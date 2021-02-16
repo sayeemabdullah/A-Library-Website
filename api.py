@@ -126,15 +126,14 @@ def create_user():
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
         
-    users = User.query.all()
-
-    #change
+    
 
     data['name'] = data['name'].upper()
 
-    for user in users:
-        if data['name'] == user.name:
-            return jsonify({'message' : 'Username already exist'})           
+    user = User.query.filter_by(name=data['name']).first()
+
+    if user:
+        return jsonify({'message' : 'Username already exist'}) 
 
 
     new_user = User(public_id=str(uuid.uuid4()), name=data['name'], password=hashed_password, admin=False)
@@ -232,14 +231,12 @@ def add_book(current_user):
     
     data = request.get_json()
        
-    books = Book.query.all()
-
     data['name'] = data['name'].upper()
 
-    for book in books:
-        if data['name'] == book.name:
-            return jsonify({'message' : 'Book is already in the library'})           
-
+    book = Book.query.filter_by(name=data['name']).first()
+    
+    if book:
+        return jsonify({'message' : 'Book is already in the library'})
 
     new_book = Book(book_public_id=str(uuid.uuid4()),name=data['name'], author=data['author'], publication_year=data['publication_year'])
 
