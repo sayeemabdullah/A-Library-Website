@@ -148,9 +148,6 @@ def create_user():
 @token_required 
 def promote_user(current_user, public_id):
 
-    if not current_user.admin:
-        return jsonify({'message' : 'You are not authorized.'})
-
     user = User.query.filter_by(public_id=public_id).first()
 
     if not user:
