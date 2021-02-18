@@ -63,7 +63,7 @@ I have used **Werkzeug** to ensure secure password and **JSON Web Token Authenti
 
 To use the admin user you can use admin as both name and password to login by using **http://127.0.0.1:5000/api/login**. After tha a **token** will be generated which
 will be need in during testing other functionality. The token is to be used as **x-access-token** in the **header**. You can also sign up as general user by posting 
-**http://127.0.0.1:5000/api/login** & sending json file and request PUT to promote user to Admin or request DELETE to delete user by only if you are logged in as admin.
+**http://127.0.0.1:5000/api/user** & sending json file and request PUT to promote user to Admin or request DELETE to delete user by only if you are logged in as admin.
 Beside that both the user can use **/api/book** and **/api/wishlist** to test other functionality. 
 
 
