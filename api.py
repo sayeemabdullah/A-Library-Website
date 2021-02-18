@@ -274,7 +274,7 @@ def update_book(current_user, book_public_id):
     if not book:
         return jsonify({'message' : 'Book not found'})
     else:
-        book.name = data['name']
+        book.name = data['name'].upper()
         book.author = data['author']
         book.publication_year = data['publication_year'] 
         db.session.commit()
